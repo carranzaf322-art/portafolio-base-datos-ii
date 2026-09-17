@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Base de Datos II | Portafolio</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+
+<body>
+
+  <!-- FONDO -->
+  <div class="background"></div>
+  <div class="overlay"></div>
+
+  <!-- LOGO UPLA -->
+  <div class="logo-upla">
+    <img src="assets/logoupla.png" alt="Logo UPLA">
+  </div>
+
+  <main id="app">
+
+    <!-- ========================= -->
+    <!-- BIENVENIDA -->
+    <!-- ========================= -->
+
+    <section id="home" class="page active">
+
+      <div class="welcome-layout">
+
+        <div class="welcome-content">
+
+          <p class="eyebrow">PORTAFOLIO ACADÉMICO</p>
+
+          <h1>BIENVENIDO</h1>
+
+          <h2>BASE DE DATOS II</h2>
+          <h3 class="university-name">
+             UNIVERSIDAD PERUANA LOS ANDES
+          </h3>
+
+          <p class="student-name">
+            Carranza Romaní Franklin
+          </p>
+
+          <div class="actions">
+
+            <button
+              class="btn primary"
+              data-page="profile">
+              Visitar perfil
+            </button>
+
+            <button
+              class="btn secondary"
+              data-page="portfolio">
+              Portafolio
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- FOTO DEL ESTUDIANTE -->
+
+        <div class="student-photo">
+
+          <img
+            src="assets/foto-estudiante.jpg"
+            alt="Foto del estudiante"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+
+          <div class="photo-placeholder">
+            FOTO
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ========================= -->
+    <!-- PERFIL -->
+    <!-- ========================= -->
+
+    <section id="profile" class="page">
+
+      <div class="topbar">
+
+        <button
+          class="back"
+          data-page="home">
+          ← Volver
+        </button>
+
+        <span>PERFIL</span>
+
+      </div>
+
+
+      <div class="profile-card">
+
+        <!-- FOTO -->
+
+        <div class="profile-photo">
+
+          <img
+            src="assets/foto-estudiante.jpg"
+            alt="Foto de Franklin Carranza Romaní"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+
+          <div class="photo-placeholder">
+            FOTO
+          </div>
+
+        </div>
+
+
+        <!-- INFORMACIÓN -->
+
+        <div class="profile-info">
+
+          <p class="eyebrow">
+            ESTUDIANTE
+          </p>
+
+          <h1>
+            Carranza Romaní Franklin
+          </h1>
+
+          <p>
+            <strong>Carrera:</strong>
+            Ingeniería de Sistemas
+          </p>
+
+          <p>
+            <strong>Curso:</strong>
+            Base de Datos II
+          </p>
+
+          <p>
+            <strong>Docente:</strong>
+            Fernandez Bejarano Raul Enrique
+          </p>
+
+          <p>
+            <strong>Correo:</strong>
+            t01266e@ms.upla.edu.pe
+          </p>
+
+          <p>
+            <strong>Código:</strong>
+            T01266E
+          </p>
+
+
+          <!-- DESCRIPCIÓN -->
+
+          <!-- EDITA ESTA DESCRIPCIÓN DIRECTAMENTE EN EL HTML -->
+
+          <div class="description">
+
+            <h3>
+              Descripción
+            </h3>
+
+            <p>
+              Soy Franklin, estudiante de Ingeniería de Sistemas
+              en la Universidad Peruana Los Andes, con código
+              CÓDIGO POR COMPLETAR. Este portafolio reúne mi
+              proceso de aprendizaje en Base de Datos II, mis
+              entregas y mis objetivos de formación. Me interesa
+              conectar la lógica, la creatividad y los datos para
+              construir soluciones útiles.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ========================= -->
+    <!-- PORTAFOLIO -->
+    <!-- ========================= -->
+
+    <section id="portfolio" class="page">
+
+      <div class="topbar">
+
+        <button
+          class="back"
+          data-page="home">
+          ← Volver
+        </button>
+
+        <span>
+          PORTAFOLIO
+        </span>
+
+      </div>
+
+
+      <!-- AQUÍ JAVASCRIPT MOSTRARÁ LAS UNIDADES -->
+
+      <div id="portfolio-view"></div>
+      <input type="file" id="file-picker" multiple hidden>
+
+    </section>
+
+  </main>
+
+
+  <!-- JAVASCRIPT -->
+
+  <script src="script.js"></script>
+
+</body>
+
+</html>
