@@ -1,5 +1,33 @@
+// ==========================================================
+// BASE DE DATOS II - PORTAFOLIO ACADÉMICO
+// TEMA: DOTA 2
+// ALMACENAMIENTO: GITHUB
+// ==========================================================
+
 const pages = document.querySelectorAll(".page");
 const portfolioView = document.getElementById("portfolio-view");
+
+// ==========================================================
+// CONFIGURACIÓN DE GITHUB
+// ==========================================================
+
+const GITHUB_USER = "carranzaf322-art";
+const GITHUB_REPO = "portafolio-base-datos-ii";
+const GITHUB_BRANCH = "main";
+
+const GITHUB_API =
+  `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents`;
+
+const GITHUB_WEB =
+  `https://github.com/${GITHUB_USER}/${GITHUB_REPO}/tree/${GITHUB_BRANCH}`;
+
+const GITHUB_RAW =
+  `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${GITHUB_BRANCH}`;
+
+
+// ==========================================================
+// UNIDADES
+// ==========================================================
 
 const units = [
   { id: 1, name: "UNIDAD 01" },
@@ -9,29 +37,42 @@ const units = [
 ];
 
 
-// ========================================
-// NAVEGACIÓN ENTRE PÁGINAS
-// ========================================
+// ==========================================================
+// NAVEGACIÓN
+// ==========================================================
 
 function showPage(id) {
+
   pages.forEach(page => {
-    page.classList.toggle("active", page.id === id);
+
+    page.classList.toggle(
+      "active",
+      page.id === id
+    );
+
   });
 
   window.scrollTo({
     top: 0,
     behavior: "smooth"
   });
+
 }
 
 
+// ==========================================================
+// BOTONES DE NAVEGACIÓN
+// ==========================================================
+
 document.addEventListener("click", event => {
 
-  const target = event.target.closest("[data-page]");
+  const target =
+    event.target.closest("[data-page]");
 
   if (!target) return;
 
-  const page = target.dataset.page;
+  const page =
+    target.dataset.page;
 
   if (page === "portfolio") {
     renderUnits();
@@ -42,9 +83,9 @@ document.addEventListener("click", event => {
 });
 
 
-// ========================================
+// ==========================================================
 // MOSTRAR UNIDADES
-// ========================================
+// ==========================================================
 
 function renderUnits() {
 
@@ -53,7 +94,7 @@ function renderUnits() {
     <div class="explorer-header">
 
       <p class="eyebrow">
-        EXPLORADOR ACADÉMICO
+        ⚔ EXPLORADOR ACADÉMICO ⚔
       </p>
 
       <h1>
@@ -66,7 +107,6 @@ function renderUnits() {
 
     </div>
 
-
     <div class="folder-grid">
 
       ${units.map(unit => `
@@ -76,7 +116,7 @@ function renderUnits() {
           data-unit="${unit.id}">
 
           <div class="folder-icon">
-            📁
+            ⚔️
           </div>
 
           <h2>
@@ -84,7 +124,7 @@ function renderUnits() {
           </h2>
 
           <p>
-            Semanas 1 — 4
+            SEMANAS 01 — 04
           </p>
 
         </article>
@@ -96,31 +136,36 @@ function renderUnits() {
   `;
 
 
-  document.querySelectorAll("[data-unit]").forEach(folder => {
+  document
+    .querySelectorAll("[data-unit]")
+    .forEach(folder => {
 
-    folder.addEventListener("click", () => {
+      folder.addEventListener(
+        "click",
+        () => {
 
-      renderWeeks(
-        Number(folder.dataset.unit)
+          renderWeeks(
+            Number(folder.dataset.unit)
+          );
+
+        }
       );
 
     });
 
-  });
-
 }
 
 
-// ========================================
+// ==========================================================
 // MOSTRAR SEMANAS
-// ========================================
+// ==========================================================
 
 function renderWeeks(unitId) {
 
-  const unit = units.find(
-    item => item.id === unitId
-  );
-
+  const unit =
+    units.find(
+      item => item.id === unitId
+    );
 
   portfolioView.innerHTML = `
 
@@ -130,12 +175,12 @@ function renderWeeks(unitId) {
         class="back"
         id="back-units">
 
-        ← Unidades
+        ← UNIDADES
 
       </button>
 
       <span>
-        ${unit.name}
+        ⚔ ${unit.name}
       </span>
 
     </div>
@@ -152,7 +197,7 @@ function renderWeeks(unitId) {
       </h1>
 
       <p>
-        Selecciona una semana para ver sus archivos.
+        Selecciona una semana para consultar tus documentos.
       </p>
 
     </div>
@@ -167,15 +212,15 @@ function renderWeeks(unitId) {
           data-week="${week}">
 
           <div class="week-icon">
-            📂
+            📜
           </div>
 
           <h2>
-            SEMANA ${week}
+            SEMANA ${String(week).padStart(2, "0")}
           </h2>
 
           <p>
-            Explorar archivos
+            EXPLORAR ARCHIVOS
           </p>
 
         </article>
@@ -189,209 +234,103 @@ function renderWeeks(unitId) {
 
   document
     .getElementById("back-units")
-    .addEventListener("click", renderUnits);
+    .addEventListener(
+      "click",
+      renderUnits
+    );
 
 
   document
     .querySelectorAll("[data-week]")
     .forEach(card => {
 
-      card.addEventListener("click", () => {
+      card.addEventListener(
+        "click",
+        () => {
 
-        renderFiles(
-          unitId,
-          Number(card.dataset.week)
-        );
+          renderFiles(
+            unitId,
+            Number(card.dataset.week)
+          );
 
-      });
+        }
+      );
 
     });
 
 }
 
 
-// ========================================
-// BASE DE DATOS LOCAL
-// ========================================
+// ==========================================================
+// OBTENER ARCHIVOS DESDE GITHUB
+// ==========================================================
 
-let db;
+async function getGithubFiles(path) {
 
+  try {
 
-// Abrir IndexedDB
-function openDB() {
-
-  return new Promise((resolve, reject) => {
-
-    const request = indexedDB.open(
-      "PortafolioBaseDatosII",
-      1
-    );
-
-
-    request.onupgradeneeded = event => {
-
-      db = event.target.result;
-
-
-      if (!db.objectStoreNames.contains("files")) {
-
-        const store = db.createObjectStore(
-          "files",
-          {
-            keyPath: "id",
-            autoIncrement: true
-          }
-        );
-
-
-        store.createIndex(
-          "folder",
-          "folder",
-          {
-            unique: false
-          }
-        );
-
-      }
-
-    };
-
-
-    request.onsuccess = event => {
-
-      db = event.target.result;
-
-      resolve(db);
-
-    };
-
-
-    request.onerror = event => {
-
-      reject(event.target.error);
-
-    };
-
-  });
-
-}
-
-
-// ========================================
-// OBTENER ARCHIVOS DE UNA SEMANA
-// ========================================
-
-function getFiles(folder) {
-
-  return new Promise((resolve, reject) => {
-
-    const transaction =
-      db.transaction(
-        ["files"],
-        "readonly"
+    const response =
+      await fetch(
+        `${GITHUB_API}/${path}?ref=${GITHUB_BRANCH}`
       );
 
 
-    const store =
-      transaction.objectStore("files");
+    if (response.status === 404) {
 
-
-    const index =
-      store.index("folder");
-
-
-    const request =
-      index.getAll(folder);
-
-
-    request.onsuccess = () => {
-
-      resolve(request.result);
-
-    };
-
-
-    request.onerror = () => {
-
-      reject(request.error);
-
-    };
-
-  });
-
-}
-
-
-// ========================================
-// GUARDAR ARCHIVOS
-// ========================================
-
-function saveFiles(folder, fileList) {
-
-  return new Promise((resolve, reject) => {
-
-    const transaction =
-      db.transaction(
-        ["files"],
-        "readwrite"
-      );
-
-
-    const store =
-      transaction.objectStore("files");
-
-
-    for (const file of fileList) {
-
-      store.add({
-
-        folder: folder,
-
-        name: file.name,
-
-        type: file.type,
-
-        size: file.size,
-
-        file: file,
-
-        date: new Date().toLocaleString()
-
-      });
+      return [];
 
     }
 
 
-    transaction.oncomplete = () => {
+    if (!response.ok) {
 
-      resolve();
+      throw new Error(
+        `GitHub respondió ${response.status}`
+      );
 
-    };
+    }
 
 
-    transaction.onerror = event => {
+    const data =
+      await response.json();
 
-      reject(event.target.error);
 
-    };
+    if (!Array.isArray(data)) {
 
-  });
+      return [];
+
+    }
+
+
+    return data.filter(
+      item =>
+        item.type === "file"
+    );
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "Error obteniendo archivos:",
+      error
+    );
+
+    throw error;
+
+  }
 
 }
 
 
-// ========================================
+// ==========================================================
 // MOSTRAR ARCHIVOS
-// ========================================
+// ==========================================================
 
 async function renderFiles(unitId, weekId) {
 
   const path =
-    `unidad-${String(unitId).padStart(2, "0")}/semana-${String(weekId).padStart(2, "0")}`;
-
-
-  const files =
-    await getFiles(path);
+    `documentos/unidad-${String(unitId).padStart(2, "0")}/semana-${String(weekId).padStart(2, "0")}`;
 
 
   portfolioView.innerHTML = `
@@ -402,12 +341,12 @@ async function renderFiles(unitId, weekId) {
         class="back"
         id="back-weeks">
 
-        ← Semanas
+        ← SEMANAS
 
       </button>
 
       <span>
-        U${unitId} / S${weekId}
+        ⚔ U${unitId} / S${weekId}
       </span>
 
     </div>
@@ -416,101 +355,31 @@ async function renderFiles(unitId, weekId) {
     <div class="explorer-header">
 
       <p class="eyebrow">
-        ${path}
+        DOCUMENTOS / UNIDAD ${String(unitId).padStart(2, "0")} /
+        SEMANA ${String(weekId).padStart(2, "0")}
       </p>
 
       <h1>
-        SEMANA ${weekId}
+        SEMANA ${String(weekId).padStart(2, "0")}
       </h1>
 
       <p>
-        Archivos de esta semana.
+        Archivos almacenados permanentemente en GitHub.
       </p>
 
     </div>
 
 
-    <!-- LISTA DE ARCHIVOS -->
+    <div class="file-list">
 
-    <div
-      class="file-list"
-      id="file-list">
+      <div class="loading">
 
-      ${
-        files.length === 0
+        ⚔ CARGANDO ARCHIVOS...
 
-        ?
-
-        `
-        <div class="empty">
-
-          <p>
-            Esta carpeta está vacía.
-          </p>
-
-          <small>
-            Agrega tus archivos usando el botón de abajo.
-          </small>
-
-        </div>
-        `
-
-        :
-
-        files.map(file => `
-
-          <div
-            class="file-item">
-
-            <div class="file-icon">
-              📄
-            </div>
-
-
-            <div class="file-info">
-
-              <strong>
-                ${file.name}
-              </strong>
-
-              <small>
-                ${formatSize(file.size)}
-              </small>
-
-            </div>
-
-
-            <div class="file-actions">
-
-              <button
-                class="file-btn"
-                onclick="openFile(${file.id})">
-
-                👁 VER
-
-              </button>
-
-
-              <button
-                class="file-btn delete"
-                onclick="deleteFile(${file.id}, ${unitId}, ${weekId})">
-
-                🗑 ELIMINAR
-
-              </button>
-
-            </div>
-
-          </div>
-
-        `).join("")
-
-      }
+      </div>
 
     </div>
 
-
-    <!-- BOTÓN AGREGAR -->
 
     <div class="add-file-container">
 
@@ -522,21 +391,17 @@ async function renderFiles(unitId, weekId) {
 
       </button>
 
+      <p class="github-help">
+
+        El archivo se almacena en GitHub y estará disponible
+        desde cualquier computadora.
+
+      </p>
+
     </div>
-
-
-    <!-- SELECTOR -->
-
-    <input
-      type="file"
-      id="file-picker"
-      multiple
-      hidden>
 
   `;
 
-
-  // Volver a semanas
 
   document
     .getElementById("back-weeks")
@@ -546,7 +411,9 @@ async function renderFiles(unitId, weekId) {
     );
 
 
-  // Botón agregar
+  // ========================================================
+  // BOTÓN AGREGAR ARCHIVO
+  // ========================================================
 
   document
     .getElementById("add-file")
@@ -554,214 +421,244 @@ async function renderFiles(unitId, weekId) {
       "click",
       () => {
 
-        document
-          .getElementById("file-picker")
-          .click();
+        const githubFolder =
+          `${GITHUB_WEB}/documentos/unidad-${String(unitId).padStart(2, "0")}/semana-${String(weekId).padStart(2, "0")}`;
+
+        window.open(
+          githubFolder,
+          "_blank"
+        );
 
       }
     );
 
 
-  // Seleccionar archivos
+  // ========================================================
+  // CARGAR ARCHIVOS
+  // ========================================================
 
-  document
-    .getElementById("file-picker")
-    .addEventListener(
-      "change",
-      async function () {
+  try {
 
-        const archivos =
-          this.files;
+    const files =
+      await getGithubFiles(path);
 
 
-        if (archivos.length === 0) {
-          return;
-        }
+    const fileList =
+      document.querySelector(".file-list");
 
 
-        try {
+    if (files.length === 0) {
 
-          await saveFiles(
-            path,
-            archivos
-          );
+      fileList.innerHTML = `
 
+        <div class="empty">
 
-          // Volver a cargar la semana
+          <div class="empty-icon">
+            ⚔
+          </div>
 
-          renderFiles(
-            unitId,
-            weekId
-          );
+          <h3>
+            CARPETA VACÍA
+          </h3>
 
+          <p>
+            Todavía no hay archivos en esta semana.
+          </p>
 
-        } catch (error) {
+          <small>
+            Usa AGREGAR ARCHIVO para subir un documento
+            directamente a GitHub.
+          </small>
 
-          console.error(error);
+        </div>
 
-          alert(
-            "No se pudieron guardar los archivos."
-          );
-
-        }
-
-      }
-    );
-
-}
-
-
-// ========================================
-// ABRIR / VER ARCHIVO
-// ========================================
-
-function openFile(id) {
-
-  const transaction =
-    db.transaction(
-      ["files"],
-      "readonly"
-    );
-
-
-  const store =
-    transaction.objectStore("files");
-
-
-  const request =
-    store.get(id);
-
-
-  request.onsuccess = () => {
-
-    const data =
-      request.result;
-
-
-    if (!data) {
-
-      alert(
-        "No se encontró el archivo."
-      );
+      `;
 
       return;
 
     }
 
 
-    const url =
-      URL.createObjectURL(
-        data.file
-      );
+    fileList.innerHTML = files.map(
+      file => {
+
+        const fileUrl =
+          `${GITHUB_RAW}/${path}/${encodeURIComponent(file.name)}`;
 
 
-    window.open(
-      url,
-      "_blank"
-    );
+        return `
+
+          <div class="file-item">
+
+            <div class="file-icon">
+              ${getFileIcon(file.name)}
+            </div>
+
+
+            <div class="file-info">
+
+              <strong>
+                ${escapeHTML(file.name)}
+              </strong>
+
+              <small>
+                ARCHIVO DE GITHUB
+              </small>
+
+            </div>
+
+
+            <div class="file-actions">
+
+              <button
+                class="file-btn"
+                onclick="openGithubFile('${fileUrl}')">
+
+                👁 VER
+
+              </button>
+
+
+              <a
+                class="file-btn"
+                href="${file.html_url}"
+                target="_blank"
+                rel="noopener noreferrer">
+
+                ⚔ GITHUB
+
+              </a>
+
+            </div>
+
+          </div>
+
+        `;
+
+      }
+    ).join("");
+
+  }
+
+  catch (error) {
+
+    document.querySelector(".file-list").innerHTML = `
+
+      <div class="empty">
+
+        <div class="empty-icon">
+          ⚠
+        </div>
+
+        <h3>
+          NO SE PUDIERON CARGAR LOS ARCHIVOS
+        </h3>
+
+        <p>
+          Revisa que el repositorio de GitHub sea público.
+        </p>
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+// ==========================================================
+// ABRIR ARCHIVO
+// ==========================================================
+
+function openGithubFile(url) {
+
+  window.open(
+    url,
+    "_blank",
+    "noopener,noreferrer"
+  );
+
+}
+
+
+// ==========================================================
+// ICONOS
+// ==========================================================
+
+function getFileIcon(filename) {
+
+  const extension =
+    filename
+      .split(".")
+      .pop()
+      .toLowerCase();
+
+
+  const icons = {
+
+    pdf: "📕",
+
+    doc: "📘",
+    docx: "📘",
+
+    xls: "📗",
+    xlsx: "📗",
+
+    ppt: "📙",
+    pptx: "📙",
+
+    sql: "🗄️",
+
+    csv: "📊",
+
+    txt: "📄",
+
+    jpg: "🖼️",
+    jpeg: "🖼️",
+    png: "🖼️",
+    gif: "🖼️",
+
+    zip: "📦",
+    rar: "📦",
+
+    js: "⚙️",
+    html: "🌐",
+    css: "🎨",
+
+    mp4: "🎬",
+    mp3: "🎵"
 
   };
 
-}
 
-
-// ========================================
-// ELIMINAR ARCHIVO
-// ========================================
-
-function deleteFile(id, unitId, weekId) {
-
-  const confirmar =
-    confirm(
-      "¿Quieres eliminar este archivo?"
-    );
-
-
-  if (!confirmar) {
-    return;
-  }
-
-
-  const transaction =
-    db.transaction(
-      ["files"],
-      "readwrite"
-    );
-
-
-  const store =
-    transaction.objectStore("files");
-
-
-  store.delete(id);
-
-
-  transaction.oncomplete = () => {
-
-    renderFiles(
-      unitId,
-      weekId
-    );
-
-  };
+  return icons[extension] || "📄";
 
 }
 
 
-// ========================================
-// FORMATO DEL TAMAÑO
-// ========================================
+// ==========================================================
+// PROTECCIÓN CONTRA HTML
+// ==========================================================
 
-function formatSize(bytes) {
+function escapeHTML(text) {
 
-  if (bytes === 0) {
-    return "0 Bytes";
-  }
-
-
-  const sizes = [
-    "Bytes",
-    "KB",
-    "MB",
-    "GB"
-  ];
-
-
-  const i =
-    Math.floor(
-      Math.log(bytes) /
-      Math.log(1024)
-    );
-
-
-  return (
-    Math.round(
-      bytes /
-      Math.pow(1024, i) *
-      100
-    ) / 100
-  )
-  + " "
-  + sizes[i];
+  return String(text)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 
 }
 
 
-// ========================================
-// INICIAR BASE DE DATOS
-// ========================================
+// ==========================================================
+// INICIO
+// ==========================================================
 
-openDB()
-  .then(() => {
+renderUnits();
 
-    renderUnits();
-
-  })
-  .catch(error => {
-
-    console.error(
-      "Error al abrir la base de datos:",
-      error
-    );
-
-  });
+console.log(
+  "⚔ PORTAFOLIO BASE DE DATOS II - GITHUB ACTIVO ⚔"
+);
